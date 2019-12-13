@@ -102,6 +102,9 @@ class ProductSaleElements extends BaseProductSaleElements
             ->filterByCurrencyId($currency->getId())
             ->findOne();
 
+        $price = 0.0;
+        $promoPrice = 0.0;
+
         if (null === $productPrice || $productPrice->getFromDefaultCurrency()) {
             // need to calculate the prices based on the product prices for the default currency
             $productPrice = ProductPriceQuery::create()
