@@ -51,6 +51,13 @@ class ProductSaleElements extends BaseProductSaleElements
         return $amount;
     }
 
+    /**
+     * @param Country $country
+     * @param string $virtualColumnName
+     * @param int $discount
+     * @return int
+     * @throws PropelException
+     */
     public function getTaxedPrice(Country $country, State $state = null, $virtualColumnName = 'price_PRICE', $discount = 0)
     {
         $taxCalculator = new Calculator();
