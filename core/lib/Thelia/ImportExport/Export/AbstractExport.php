@@ -45,6 +45,12 @@ abstract class AbstractExport implements \Iterator
     const USE_RANGE_DATE = false;
 
     /**
+     * @var boolean Use range date day
+     * -DC- Add range date day
+     */
+    const USE_RANGE_DATE_DAY = false;
+
+    /**
      * @var array|\Propel\Runtime\Util\PropelModelPager Data to export
      */
     private $data;
@@ -383,6 +389,16 @@ abstract class AbstractExport implements \Iterator
         return static::USE_RANGE_DATE;
     }
 
+    /**
+     * Whether export bounded with date day
+     * -DC- Add range date day
+     *
+     * @return boolean
+     */
+    public function useRangeDateDay()
+    {
+    	return static::USE_RANGE_DATE_DAY;
+    }
 
     /**
      * Get file name

@@ -175,17 +175,35 @@ class ExportHandler
             }
         }
 
+        // -DC- Add range date day
+        $useRangeDateDay = $export->useRangeDateDay();
         if ($rangeDate['start'] && !($rangeDate['start'] instanceof \DateTime)) {
+        	if ($useRangeDateDay) {
+        		$rangeDate['start'] = \DateTime::createFromFormat(
+        			'Y-m-d H:i:s',
+        			$rangeDate['start']['year'] . '-' . $rangeDate['start']['month'] . '-' . $rangeDate['start']['day'] . ' 00:00:00'
+        			);
+        	}
+        	else {
             $rangeDate['start'] = \DateTime::createFromFormat(
                 'Y-m-d H:i:s',
                 $rangeDate['start']['year'] . '-' . $rangeDate['start']['month'] . '-1 00:00:00'
             );
+        	}
         }
         if ($rangeDate['end'] && !($rangeDate['end'] instanceof \DateTime)) {
+        	if ($useRangeDateDay) {
+        		$rangeDate['end'] = \DateTime::createFromFormat(
+        			'Y-m-d H:i:s',
+        			$rangeDate['end']['year'] . '-' . $rangeDate['end']['month'] . '-' . $rangeDate['end']['day'] . ' 23:59:59'
+        			);
+        	}
+        	else {
             $rangeDate['end'] = \DateTime::createFromFormat(
                 'Y-m-d H:i:s',
                 $rangeDate['end']['year'] . '-' . (\intval($rangeDate['end']['month']) + 1) . '-0 23:59:59'
             );
+        	}
         }
         $instance->setRangeDate($rangeDate);
 
@@ -216,7 +234,10 @@ class ExportHandler
             }
 
             // Finalize archive
-            $event->getArchiver()->add($filePath)->save();
+            // -DC- Set export file name inside zip
+            //$event->getArchiver()->add($filePath)->save();
+            $baseName = sprintf('%s.%s', $instance->getFileName(), $serializer->getExtension());
+            $event->getArchiver()->add($filePath, $baseName)->save();
 
             // Change returned file path
             $event->setFilePath($event->getArchiver()->getArchivePath());

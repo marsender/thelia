@@ -91,6 +91,16 @@ class Export extends BaseExport
         return static::$cache->useRangeDate();
     }
 
+    // -DC- Add range date day
+    public function useRangeDateDay()
+    {
+        if (static::$cache === null) {
+            static::$cache = $this->getHandleClassInstance();
+        }
+
+        return static::$cache->useRangeDateDay();
+    }
+
     /**
      * {@inheritDoc}
      */

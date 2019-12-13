@@ -51,18 +51,11 @@ class ProductSaleElements extends BaseProductSaleElements
         return $amount;
     }
 
-    /**
-     * @param Country $country
-     * @param string $virtualColumnName
-     * @param int $discount
-     * @return int
-     * @throws PropelException
-     */
-    public function getTaxedPrice(Country $country, $virtualColumnName = 'price_PRICE', $discount = 0)
+    public function getTaxedPrice(Country $country, State $state = null, $virtualColumnName = 'price_PRICE', $discount = 0)
     {
         $taxCalculator = new Calculator();
 
-        return $taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPrice($virtualColumnName, $discount));
+        return round($taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice($this->getPrice($virtualColumnName, $discount)), 2);
     }
 
     /**
@@ -72,11 +65,11 @@ class ProductSaleElements extends BaseProductSaleElements
      * @return int
      * @throws PropelException
      */
-    public function getTaxedPromoPrice(Country $country, $virtualColumnName = 'price_PROMO_PRICE', $discount = 0)
+    public function getTaxedPromoPrice(Country $country, State $state = null, $virtualColumnName = 'price_PROMO_PRICE', $discount = 0)
     {
         $taxCalculator = new Calculator();
 
-        return $taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPromoPrice($virtualColumnName, $discount));
+        return round($taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice($this->getPromoPrice($virtualColumnName, $discount)), 2);
     }
 
     /**

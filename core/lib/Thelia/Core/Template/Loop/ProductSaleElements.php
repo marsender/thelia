@@ -237,6 +237,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
     public function parseResults(LoopResult $loopResult)
     {
         $taxCountry = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
+        $taxState = $this->container->get('thelia.taxEngine')->getDeliveryState();
         /** @var \Thelia\Core\Security\SecurityContext $securityContext */
         $securityContext = $this->container->get('thelia.securityContext');
         $discount = 0;
@@ -253,6 +254,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
             try {
                 $taxedPrice = $PSEValue->getTaxedPrice(
                     $taxCountry,
+                		$taxState,
                     'price_PRICE',
                     $discount
                 );
@@ -264,6 +266,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
             try {
                 $taxedPromoPrice = $PSEValue->getTaxedPromoPrice(
                     $taxCountry,
+                		$taxState,
                     'price_PROMO_PRICE',
                     $discount
                 );

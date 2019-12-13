@@ -80,6 +80,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
     public function parseResults(LoopResult $loopResult)
     {
         $taxCountry = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
+        $taxState = $this->container->get('thelia.taxEngine')->getDeliveryState();
         $locale = $this->getCurrentRequest()->getSession()->getLang()->getLocale();
         $checkAvailability = ConfigQuery::checkAvailableStock();
         $defaultAvailability = \intval(ConfigQuery::read('default-available-stock', 100));
@@ -104,13 +105,13 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             }
             $loopResultRow->set("PRICE", $cartItem->getPrice())
                 ->set("PROMO_PRICE", $cartItem->getPromoPrice())
-                ->set("TAXED_PRICE", $cartItem->getTaxedPrice($taxCountry))
-                ->set("PROMO_TAXED_PRICE", $cartItem->getTaxedPromoPrice($taxCountry))
+                ->set("TAXED_PRICE", $cartItem->getTaxedPrice($taxCountry, $taxState))
+                ->set("PROMO_TAXED_PRICE", $cartItem->getTaxedPromoPrice($taxCountry, $taxState))
                 ->set("IS_PROMO", $cartItem->getPromo() === 1 ? 1 : 0);
             $loopResultRow->set("TOTAL_PRICE", $cartItem->getPrice()*$cartItem->getQuantity())
                 ->set("TOTAL_PROMO_PRICE", $cartItem->getPromoPrice()*$cartItem->getQuantity())
-                ->set("TOTAL_TAXED_PRICE", $cartItem->getTotalTaxedPrice($taxCountry))
-                ->set("TOTAL_PROMO_TAXED_PRICE", $cartItem->getTotalTaxedPromoPrice($taxCountry));
+                ->set("TOTAL_TAXED_PRICE", $cartItem->getTotalTaxedPrice($taxCountry, $taxState))
+                ->set("TOTAL_PROMO_TAXED_PRICE", $cartItem->getTotalTaxedPromoPrice($taxCountry, $taxState));
             $loopResultRow->set("PRODUCT_SALE_ELEMENTS_ID", $productSaleElement->getId());
             $loopResultRow->set("PRODUCT_SALE_ELEMENTS_REF", $productSaleElement->getRef());
             $this->addOutputFields($loopResultRow, $cartItem);

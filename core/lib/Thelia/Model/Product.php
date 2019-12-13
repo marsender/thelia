@@ -43,18 +43,18 @@ class Product extends BaseProduct implements FileModelParentInterface
         return $amount;
     }
 
-    public function getTaxedPrice(Country $country, $price)
+    public function getTaxedPrice(Country $country, State $state = null, $price = 0)
     {
         $taxCalculator = new Calculator();
 
-        return $taxCalculator->load($this, $country)->getTaxedPrice($price);
+        return round($taxCalculator->load($this, $country, $state)->getTaxedPrice($price), 2);
     }
 
-    public function getTaxedPromoPrice(Country $country, $price)
+    public function getTaxedPromoPrice(Country $country, State $state = null, $price = 0)
     {
         $taxCalculator = new Calculator();
 
-        return $taxCalculator->load($this, $country)->getTaxedPrice($price);
+        return round($taxCalculator->load($this, $country, $state)->getTaxedPrice($price), 2);
     }
 
     /**
