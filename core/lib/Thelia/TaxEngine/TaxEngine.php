@@ -19,6 +19,7 @@ use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\State;
+use GarnierCustomer\Model\CustomerGs;
 
 /**
  * Class TaxEngine
@@ -60,7 +61,7 @@ class TaxEngine
     /**
      * Add a tax type to the current list.
      *
-     * @param unknown $fullyQualifiedclassName the fully qualified classname, su chas MyTaxes\Taxes\MyTaxType
+     * @param string $fullyQualifiedclassName the fully qualified classname, su chas MyTaxes\Taxes\MyTaxType
      *
      */
     public function addTaxType($fullyQualifiedclassName)
@@ -121,6 +122,12 @@ class TaxEngine
             /* is there a logged in customer ? */
             /** @var Customer $customer */
             if (null !== $customer = $this->getSession()->getCustomerUser()) {
+            		// Get customer tax country according to profile
+            		$this->taxCountry = CustomerGs::GetCustomerTaxCountry($customer);
+            		if (isset($this->taxCountry)) {
+            			$this->taxState = null;
+            			return $this->taxCountry;
+            		}
                 if (null !== $this->getSession()->getOrder()
                         && null !== $this->getSession()->getOrder()->getChoosenDeliveryAddress()
                         && null !== $currentDeliveryAddress = AddressQuery::create()->findPk($this->getSession()->getOrder()->getChoosenDeliveryAddress())) {
