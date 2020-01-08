@@ -123,7 +123,7 @@ class TaxEngine
             /** @var Customer $customer */
             if (null !== $customer = $this->getSession()->getCustomerUser()) {
             		// Get customer tax country according to profile
-            		$this->taxCountry = CustomerGs::GetCustomerTaxCountry($customer);
+	            	$this->taxCountry = CustomerGs::GetCustomerTaxCountry($customer, $this->getSession());
             		if (isset($this->taxCountry)) {
             			$this->taxState = null;
             			return $this->taxCountry;
