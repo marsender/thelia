@@ -290,7 +290,7 @@ class Product extends BaseProduct implements FileModelParentInterface
         // deleting the product, as the delete is cascaded to the feature_product table.
         $featureAvs = FeatureAvQuery::create()
             ->useFeatureProductQuery()
-            ->filterByIsFreeText(true)
+            ->filterByFreeTextValue(true)
             ->filterByProductId($this->getId())
             ->endUse()
             ->find($con)
