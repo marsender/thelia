@@ -276,6 +276,9 @@ class ExportHandler
         $serializer->prepareFile($file);
 
         foreach ($export as $idx => $data) {
+	        	if ($data === NULL) {
+	        		continue;
+	        	}
             $data = $export->beforeSerialize($data);
             $data = $export->applyOrderAndAliases($data);
             $data = $serializer->serialize($data);
