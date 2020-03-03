@@ -206,11 +206,13 @@ class OrderController extends BaseFrontController
             return $this->generateRedirectFromRoute("order.invoice");
 
         } catch (FormValidationException $e) {
-            $message = $this->getTranslator()->trans(
+            /*$message = $this->getTranslator()->trans(
                 "Please check your input: %s",
                 ['%s' => $e->getMessage()],
                 Front::MESSAGE_DOMAIN
-            );
+            );*/
+        		// -DC- Return only error messages
+        		$message = $e->getMessage();
         } catch (PropelException $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         } catch (\Exception $e) {
@@ -277,11 +279,13 @@ class OrderController extends BaseFrontController
             return $this->generateRedirectFromRoute("order.payment.process");
 
         } catch (FormValidationException $e) {
-            $message = $this->getTranslator()->trans(
+            /*$message = $this->getTranslator()->trans(
                 "Please check your input: %s",
                 ['%s' => $e->getMessage()],
                 Front::MESSAGE_DOMAIN
-            );
+            );*/
+            // -DC- Return only error messages
+            $message = $e->getMessage();
         } catch (PropelException $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         } catch (\Exception $e) {

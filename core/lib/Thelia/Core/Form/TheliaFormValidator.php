@@ -70,12 +70,15 @@ class TheliaFormValidator implements TheliaFormValidatorInterface
                 if ($form->get("error_message")->getData() != null) {
                     $errorMessage = $form->get("error_message")->getData();
                 } else {
-                    $errorMessage = sprintf(
+                    /*$errorMessage = sprintf(
                         $this->translator->trans(
                             "Missing or invalid data: %s"
                         ),
                         $this->getErrorMessages($form)
                     );
+                    */
+                		// -DC- Return only error messages
+                    $errorMessage = $this->getErrorMessages($form);
                 }
                 $aBaseForm->setError(true);
                 throw new FormValidationException($errorMessage);
@@ -115,7 +118,9 @@ class TheliaFormValidator implements TheliaFormValidatorInterface
                     $fieldName = $child->getName();
                 }
 
-                $errors .= sprintf("[%s] %s, ", $fieldName, $this->getErrorMessages($child));
+                // -DC- Remove field names
+                //$errors .= sprintf("[%s] %s, ", $fieldName, $this->getErrorMessages($child));
+                $errors .= sprintf("%s, ", $this->getErrorMessages($child));
             }
         }
 
