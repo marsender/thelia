@@ -61,6 +61,16 @@ class OrderDelivery extends BaseForm
         if (null === $address) {
             $context->addViolation(Translator::getInstance()->trans("Address ID not found"));
         }
+        $disabledCountries = array();
+        $disabledCountries[] = 'ITA'; // Italy
+        $disabledCountries[] = 'CHN'; // China
+        if (count($disabledCountries)) {
+	        $country = $address->getCountry();
+	        $countryIso = $country->getIsoalpha3();
+	        if (in_array($countryIso, $disabledCountries)) {
+	        	$context->addViolation(Translator::getInstance()->trans("Address country disabled"));
+	        }
+        }
     }
 
     public function verifyDeliveryModule($value, ExecutionContextInterface $context)
