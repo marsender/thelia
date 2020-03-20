@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 
@@ -61,14 +62,12 @@ class OrderDelivery extends BaseForm
         if (null === $address) {
             $context->addViolation(Translator::getInstance()->trans("Address ID not found"));
         }
-        $disabledCountries = array();
-        $disabledCountries[] = 'ITA'; // Italy
-        $disabledCountries[] = 'CHN'; // China
+        $disabledCountries = explode(' ', ConfigQuery::read('covid19_disabledcountries', ''));
         if (count($disabledCountries)) {
 	        $country = $address->getCountry();
 	        $countryIso = $country->getIsoalpha3();
 	        if (in_array($countryIso, $disabledCountries)) {
-	        	$context->addViolation(Translator::getInstance()->trans("Address country disabled"));
+	        	$context->addViolation('covid19_disabledcountries_error');
 	        }
         }
     }
