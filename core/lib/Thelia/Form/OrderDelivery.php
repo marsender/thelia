@@ -61,6 +61,7 @@ class OrderDelivery extends BaseForm
 
         if (null === $address) {
             $context->addViolation(Translator::getInstance()->trans("Address ID not found"));
+            return;
         }
         $disabledCountries = explode(' ', ConfigQuery::read('covid19_disabledcountries', ''));
         if (count($disabledCountries)) {
