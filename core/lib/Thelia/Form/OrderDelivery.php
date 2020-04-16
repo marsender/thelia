@@ -66,7 +66,12 @@ class OrderDelivery extends BaseForm
         if (count($disabledCountries)) {
 	        $country = $address->getCountry();
 	        $countryIso = $country->getIsoalpha3();
-	        if (in_array($countryIso, $disabledCountries)) {
+	        if ($countryIso == 'FRA') {
+	        	if (empty($address->getPhone()) && empty($address->getCellphone())) {
+	        		$context->addViolation('covid19_missingphone_error');
+	        	}
+	        }
+	        elseif (in_array($countryIso, $disabledCountries)) {
 	        	$context->addViolation('covid19_disabledcountries_error');
 	        }
         }
