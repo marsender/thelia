@@ -63,16 +63,19 @@ class OrderDelivery extends BaseForm
             $context->addViolation(Translator::getInstance()->trans("Address ID not found"));
             return;
         }
+        if (empty($address->getPhone()) && empty($address->getCellphone())) {
+        	$context->addViolation('missingphone_error');
+        }
         $disabledCountries = explode(' ', ConfigQuery::read('covid19_disabledcountries', ''));
         if (count($disabledCountries)) {
 	        $country = $address->getCountry();
 	        $countryIso = $country->getIsoalpha3();
-	        if ($countryIso == 'FRA') {
-	        	if (empty($address->getPhone()) && empty($address->getCellphone())) {
-	        		$context->addViolation('covid19_missingphone_error');
-	        	}
-	        }
-	        elseif (in_array($countryIso, $disabledCountries)) {
+	        //if ($countryIso == 'FRA') {
+	        //	if (empty($address->getPhone()) && empty($address->getCellphone())) {
+	        //		$context->addViolation('covid19_missingphone_error');
+	        //	}
+	        //}
+	        if (in_array($countryIso, $disabledCountries)) {
 	        	$context->addViolation('covid19_disabledcountries_error');
 	        }
         }
