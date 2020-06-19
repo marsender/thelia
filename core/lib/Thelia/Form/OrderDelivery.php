@@ -66,6 +66,11 @@ class OrderDelivery extends BaseForm
         if (empty($address->getPhone()) && empty($address->getCellphone())) {
         	$context->addViolation('missingphone_error');
         }
+        $size1 = mb_strlen($address->getAddress1());
+        $size2 = mb_strlen($address->getAddress2());
+        if ($size1 > 32 || $size2 > 32) {
+        	$context->addViolation('address_size_error');
+        }
         $disabledCountries = explode(' ', ConfigQuery::read('covid19_disabledcountries', ''));
         if (count($disabledCountries)) {
 	        $country = $address->getCountry();
