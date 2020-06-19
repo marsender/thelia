@@ -65,10 +65,10 @@ class OrderDelivery extends BaseForm
 
 	/**
 	 *
-	 * @param Address $address
+	 * @param array $errors
 	 * @param ExecutionContextInterface $context
 	 */
-	private function verifyState(Address $address, ExecutionContextInterface $context)
+	private function verifyState(Address $address, array &$errros)
 	{
 		$country = $address->getCountry();
 		if (!$country->getHasStates()) {
@@ -78,20 +78,20 @@ class OrderDelivery extends BaseForm
 		$state = $address->getState();
 		if (null !== $state) {
 			if ($state->getCountryId() !== $country->getId()) {
-				$context->addViolation(Translator::getInstance()->trans("This state doesn't belong to this country."));
+				$errors[] = Translator::getInstance()->trans('This state doesn\'t belong to this country.');
 			}
 		}
 		else {
-			$context->addViolation(Translator::getInstance()->trans("You should select a state for this country."));
+			$errors[] = Translator::getInstance()->trans('You should select a state for this country.');
 		}
 	}
 
 	/**
 	 *
-	 * @param \Thelia\Model\Address $address
+	 * @param array $errors
 	 * @param ExecutionContextInterface $context
 	 */
-	private function verifyZipCode(Address $address, ExecutionContextInterface $context)
+	private function verifyZipCode(Address $address, array &$errors)
 	{
 		$country = $address->getCountry();
 		if (!$country->getNeedZipCode()) {
@@ -100,9 +100,9 @@ class OrderDelivery extends BaseForm
 		$zipCodeRegExp = $country->getZipCodeRE();
 		if (null !== $zipCodeRegExp) {
 			if (!preg_match($zipCodeRegExp, $address->getZipcode())) {
-				$context->addViolation(Translator::getInstance()->trans("This zip code should respect the following format : %format.", [
+				$errors[] = Translator::getInstance()->trans('This zip code should respect the following format : %format.', [
 					'%format' => $country->getZipCodeFormat()
-				]));
+				]);
 			}
 		}
 	}
@@ -112,31 +112,39 @@ class OrderDelivery extends BaseForm
 		$address = AddressQuery::create()->findPk($value);
 
 		if (null === $address) {
-			$context->addViolation(Translator::getInstance()->trans("Address ID not found"));
+			$context->addViolation(Translator::getInstance()->trans('Address ID not found'));
 			return;
 		}
-		$this->verifyZipCode($address, $context);
-		$this->verifyState($address, $context);
-		if (empty($address->getPhone()) && empty($address->getCellphone())) {
-			$context->addViolation('missingphone_error');
-		}
-		$size1 = mb_strlen($address->getAddress1());
-		$size2 = mb_strlen($address->getAddress2());
-		if ($size1 > 32 || $size2 > 32) {
-			$context->addViolation('address_size_error');
-		}
+
 		$disabledCountries = explode(' ', ConfigQuery::read('covid19_disabledcountries', ''));
 		if (count($disabledCountries)) {
 			$country = $address->getCountry();
 			$countryIso = $country->getIsoalpha3();
-			//if ($countryIso == 'FRA') {
-			//	if (empty($address->getPhone()) && empty($address->getCellphone())) {
-			//		$context->addViolation('covid19_missingphone_error');
-			//	}
-			//}
 			if (in_array($countryIso, $disabledCountries)) {
 				$context->addViolation('covid19_disabledcountries_error');
+				return;
 			}
+		}
+
+		// Check address errors
+		$addressErrors = array();
+		$size1 = mb_strlen($address->getAddress1());
+		$size2 = mb_strlen($address->getAddress2());
+		if ($size1 > 32 || $size2 > 32) {
+			$addressErrors[] = Translator::getInstance()->trans('order_delivery_address_error_linesize');
+		}
+		$this->verifyZipCode($address, $addressErrors);
+		$this->verifyState($address, $addressErrors);
+		if (empty($address->getPhone()) && empty($address->getCellphone())) {
+			$addressErrors[] = Translator::getInstance()->trans('order_delivery_address_error_missingphone');
+		}
+		if (count($addressErrors)) {
+			$error = Translator::getInstance()->trans('order_delivery_address_error_header') . '<br />';
+			foreach ($addressErrors as $addressError) {
+				$error .= sprintf('&nbsp; • %s<br />', $addressError);
+			}
+			$error .= Translator::getInstance()->trans('order_delivery_address_error_footer');
+			$context->addViolation($error);
 		}
 	}
 
@@ -145,15 +153,15 @@ class OrderDelivery extends BaseForm
 		$module = ModuleQuery::create()->filterActivatedByTypeAndId(BaseModule::DELIVERY_MODULE_TYPE, $value)->findOne();
 
 		if (null === $module) {
-			$context->addViolation(Translator::getInstance()->trans("Delivery module ID not found"));
+			$context->addViolation(Translator::getInstance()->trans('Delivery module ID not found'));
 		}
 		elseif (!$module->isDeliveryModule()) {
-			$context->addViolation(sprintf(Translator::getInstance()->trans("delivery module %s is not a Thelia\Module\DeliveryModuleInterface"), $module->getCode()));
+			$context->addViolation(sprintf(Translator::getInstance()->trans('delivery module %s is not a Thelia\Module\DeliveryModuleInterface'), $module->getCode()));
 		}
 	}
 
 	public function getName()
 	{
-		return "thelia_order_delivery";
+		return 'thelia_order_delivery';
 	}
 }
