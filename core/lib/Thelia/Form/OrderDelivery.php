@@ -121,7 +121,7 @@ class OrderDelivery extends BaseForm
 			$country = $address->getCountry();
 			$countryIso = $country->getIsoalpha3();
 			if (in_array($countryIso, $disabledCountries)) {
-				$context->addViolation('covid19_disabledcountries_error');
+				$context->addViolation(Translator::getInstance()->trans('covid19_disabledcountries_error'));
 				return;
 			}
 		}
