@@ -62,7 +62,7 @@ class ContactController extends BaseFrontController
 
             $from = [ $userEmail => $userName ];
             $to = [ $storeEmail => $storeName ];
-            $subject = $userSubject;
+            $subject = sprintf('[Formulaire contact] %s', $userSubject);
             $htmlBody = '';
             $textBody = $userMessage;
             $cc = [];
