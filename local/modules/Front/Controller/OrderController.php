@@ -378,6 +378,9 @@ class OrderController extends BaseFrontController
         $customer = $this->getSecurityContext()->getCustomerUser();
 
         if (null === $customer || $placedOrder->getCustomerId() !== $customer->getId()) {
+        		// -DC- Redirect to home page and avoid error message for the user
+        		$this->getDispatcher()->dispatch(TheliaEvents::ORDER_CART_CLEAR, $this->getOrderEvent());
+        		return $this->generateRedirectFromRoute('default');
             throw new TheliaProcessException(
                 $this->getTranslator()->trans(
                     "Received placed order id does not belong to the current customer",
