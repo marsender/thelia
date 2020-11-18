@@ -126,12 +126,16 @@ class MailerFactory
         // Always add the customer ID to the parameters
         $messageParameters['customer_id'] = $customer->getId();
 
+				// -DC- Set locale from current
+        //$locale = $customer->getCustomerLang()->getLocale();
+        $locale = Translator::getInstance()->getLocale();
+
         $this->sendEmailMessage(
             $messageCode,
             [ ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName() ],
             [ $customer->getEmail() => $customer->getFirstname()." ".$customer->getLastname() ],
             $messageParameters,
-            $customer->getCustomerLang()->getLocale()
+            $locale
         );
     }
 
