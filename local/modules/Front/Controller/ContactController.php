@@ -57,6 +57,9 @@ class ContactController extends BaseFrontController
             $userSubject = $form->get('subject')->getData();
             $userMessage = $form->get('message')->getData();
 
+            // -DC- Debug post
+            Tlog::getInstance()->error(sprintf('Contact form : %s', print_r($_POST, true)));
+
             // -DC- Contact email
             $storeEmail = ConfigQuery::read('contact_email', null);
             //$storeEmail = ConfigQuery::getStoreEmail();
