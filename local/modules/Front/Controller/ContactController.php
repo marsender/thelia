@@ -23,6 +23,9 @@
 
 namespace Front\Controller;
 
+use GarnierCaptcha\Event\GarnierCaptchaEvents;
+use GarnierCaptcha\Event\GarnierCaptchaCheckEvent;
+use GarnierShop\GarnierShop;
 use Thelia\Controller\Front\BaseFrontController;
 //use Thelia\Core\Event\Contact\ContactEvent;
 //use Thelia\Core\Event\TheliaEvents;
@@ -58,7 +61,18 @@ class ContactController extends BaseFrontController
             $userMessage = $form->get('message')->getData();
 
             // -DC- Debug post
-            Tlog::getInstance()->error(sprintf('Contact form : %s', print_r($_POST, true)));
+            //Tlog::getInstance()->error(sprintf('Contact form : %s', print_r($_POST, true)));
+
+            // -DC- Check captcha on server side
+            $request = $this->getRequest();
+            $captchaResponse = $request->request->get('g-recaptcha-response');
+            $remoteIp = $request->server->get('REMOTE_ADDR');
+            $checkCaptchaEvent = new GarnierCaptchaCheckEvent($captchaResponse, $remoteIp);
+            $this->dispatch(GarnierCaptchaEvents::CHECK_CAPTCHA_EVENT, $checkCaptchaEvent);
+            if ($checkCaptchaEvent->isHuman() == false) {
+            	$error = GarnierShop::Translate('Invalid captcha');
+            	throw new FormValidationException($error);
+            }
 
             // -DC- Contact email
             $storeEmail = ConfigQuery::read('contact_email', null);
