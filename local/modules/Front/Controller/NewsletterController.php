@@ -24,6 +24,9 @@
 namespace Front\Controller;
 
 use Front\Front;
+use GarnierShop\GarnierShop;
+use GarnierCaptcha\Event\GarnierCaptchaCheckEvent;
+use GarnierCaptcha\Event\GarnierCaptchaEvents;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Newsletter\NewsletterEvent;
@@ -50,7 +53,18 @@ class NewsletterController extends BaseFrontController
         $newsletterForm = $this->createForm(FrontForm::NEWSLETTER_UNSUBSCRIBE);
 
         try {
-            $form = $this->validateForm($newsletterForm);
+        	// -DC- Check captcha on server side
+        	$request = $newsletterForm->getRequest();
+        	$captchaResponse = $request->request->get('g-recaptcha-response');
+        	$remoteIp = $request->server->get('REMOTE_ADDR');
+        	$checkCaptchaEvent = new GarnierCaptchaCheckEvent($captchaResponse, $remoteIp);
+        	$this->dispatch(GarnierCaptchaEvents::CHECK_CAPTCHA_EVENT, $checkCaptchaEvent);
+        	if ($checkCaptchaEvent->isHuman() == false) {
+        		$error = GarnierShop::Translate('Invalid captcha');
+        		throw new \Exception($error);
+        	}
+
+        	$form = $this->validateForm($newsletterForm);
 
             $email = $form->get('email')->getData();
 
@@ -106,7 +120,18 @@ class NewsletterController extends BaseFrontController
         $newsletterForm = $this->createForm(FrontForm::NEWSLETTER);
 
         try {
-            $form = $this->validateForm($newsletterForm);
+        	// -DC- Check captcha on server side
+        	$request = $newsletterForm->getRequest();
+        	$captchaResponse = $request->request->get('g-recaptcha-response');
+        	$remoteIp = $request->server->get('REMOTE_ADDR');
+        	$checkCaptchaEvent = new GarnierCaptchaCheckEvent($captchaResponse, $remoteIp);
+        	$this->dispatch(GarnierCaptchaEvents::CHECK_CAPTCHA_EVENT, $checkCaptchaEvent);
+        	if ($checkCaptchaEvent->isHuman() == false) {
+        		$error = GarnierShop::Translate('Invalid captcha');
+        		throw new \Exception($error);
+        	}
+
+        	$form = $this->validateForm($newsletterForm);
 
             $event = new NewsletterEvent(
                 $form->get('email')->getData(),
