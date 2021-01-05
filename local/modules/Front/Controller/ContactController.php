@@ -57,6 +57,7 @@ class ContactController extends BaseFrontController
 
             $userEmail = $form->get('email')->getData();
             $userName = $form->get('name')->getData();
+            $userTheme = $form->get('theme')->getData();
             $userSubject = $form->get('subject')->getData();
             $userMessage = $form->get('message')->getData();
 
@@ -75,7 +76,12 @@ class ContactController extends BaseFrontController
             }
 
             // -DC- Contact email
-            $storeEmail = ConfigQuery::read('contact_email', null);
+            $storeEmailDefault = ConfigQuery::read('contact_email', null);
+            $configEmail = sprintf('contactform_%s_email', $userTheme);
+            $storeEmail = ConfigQuery::read($configEmail, null);
+            if (empty($storeEmail)) {
+            	$storeEmail = $storeEmailDefault;
+            }
             //$storeEmail = ConfigQuery::getStoreEmail();
             $storeName = ConfigQuery::getStoreName();
 

@@ -84,7 +84,23 @@ class ContactForm extends FirewallForm
                 ),
 
             ))
-        ;
+            ->add('theme', 'choice', array(
+            	'label' => Translator::getInstance()->trans('Choose a theme'),
+            	'label_attr' => [
+            		'for' => 'theme'
+            	],
+            	'constraints' => array(
+            		new NotBlank(),
+            	),
+            	'choices' => [
+            		'' => '',
+            		'subscription' => Translator::getInstance()->trans('Subscription to our journals'),
+            		'manuscript' => Translator::getInstance()->trans('Manuscript proposal'),
+            		'press' => Translator::getInstance()->trans('Press service'),
+            		'others' => Translator::getInstance()->trans('Others')
+            	]
+            ))
+            ;
     }
 
     /**
