@@ -66,8 +66,9 @@ class CustomerCreateForm extends AddressCreateForm
             ))
             ->add("password_confirm", "password", array(
                 "constraints" => array(
-                    new Constraints\NotBlank(),
-                    new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4))),
+                		// -DC-
+                    //new Constraints\NotBlank(),
+                    //new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4))),
                     new Constraints\Callback(array("methods" => array(
                         array($this, "verifyPasswordField"),
                     ))),
@@ -85,13 +86,15 @@ class CustomerCreateForm extends AddressCreateForm
                 ),
                 "required" => false,
             ))
+						// -DC-
+						/*
             ->add('lang_id', 'integer', array(
                 'required' => false,
                 'label' => Translator::getInstance()->trans('Preferred language'),
                 'label_attr' => array(
                     'for' => 'lang_id',
                 ),
-            ))
+            ))*/
         ;
 
         //confirm email
