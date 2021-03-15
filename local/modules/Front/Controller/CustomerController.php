@@ -43,7 +43,6 @@ use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
-use Thelia\Model\Newsletter;
 use Thelia\Model\NewsletterQuery;
 use Thelia\Tools\RememberMeTrait;
 use Thelia\Tools\URL;
@@ -157,7 +156,19 @@ class CustomerController extends BaseFrontController
     public function createAction()
     {
         if (! $this->getSecurityContext()->hasCustomerUser()) {
-            $customerCreation = $this->createForm(FrontForm::CUSTOMER_CREATE);
+        	$wantCsrf = true;
+        	if ($wantCsrf) {
+        		$customerCreation = $this->createForm(FrontForm::CUSTOMER_CREATE);
+        	}
+        	else {
+        	$customerCreation = $this->createForm(FrontForm::CUSTOMER_CREATE,
+        		"form",
+        		array(),
+        		array(
+        			'csrf_protection'   => false,
+        		)
+        		);
+        	}
 
             try {
                 $form = $this->validateForm($customerCreation, "post");
@@ -249,17 +260,15 @@ class CustomerController extends BaseFrontController
         $this->checkAuth();
 
         /** @var Customer $customer */
-        $customer   = $this->getSecurityContext()->getCustomerUser();
-        $newsletter = NewsletterQuery::create()->findOneByEmail($customer->getEmail());
-        $data       = array(
-            'id'            => $customer->getId(),
-            'title'         => $customer->getTitleId(),
-            'firstname'     => $customer->getFirstName(),
-            'lastname'      => $customer->getLastName(),
-            'email'         => $customer->getEmail(),
-            'email_confirm' => $customer->getEmail(),
-            'lang_id'       => $customer->getLangId(),
-            'newsletter'    => $newsletter instanceof Newsletter ? !$newsletter->getUnsubscribed() : false,
+        $customer = $this->getSecurityContext()->getCustomerUser();
+        $data = array(
+            'id'           => $customer->getId(),
+            'title'        => $customer->getTitleId(),
+            'firstname'    => $customer->getFirstName(),
+            'lastname'     => $customer->getLastName(),
+            'email'        => $customer->getEmail(),
+            'email_confirm'        => $customer->getEmail(),
+            'newsletter'   => null !== NewsletterQuery::create()->findOneByEmail($customer->getEmail()),
         );
 
         $customerProfileUpdateForm = $this->createForm(FrontForm::CUSTOMER_PROFILE_UPDATE, 'form', $data);
@@ -271,6 +280,7 @@ class CustomerController extends BaseFrontController
     public function updatePasswordAction()
     {
         if ($this->getSecurityContext()->hasCustomerUser()) {
+        		$message = '';
             $customerPasswordUpdateForm = $this->createForm(FrontForm::CUSTOMER_PASSWORD_UPDATE);
 
             try {
@@ -588,7 +598,7 @@ class CustomerController extends BaseFrontController
             isset($data["country"])?$data["country"]:null,
             isset($data["email"])?$data["email"]:null,
             isset($data["password"]) ? $data["password"]:null,
-            isset($data["lang_id"]) ? $data["lang_id"]:$this->getSession()->getLang()->getId(),
+            $this->getRequest()->getSession()->getLang()->getId(),
             isset($data["reseller"])?$data["reseller"]:null,
             isset($data["sponsor"])?$data["sponsor"]:null,
             isset($data["discount"])?$data["discount"]:null,
