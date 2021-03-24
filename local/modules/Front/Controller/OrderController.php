@@ -257,6 +257,21 @@ class OrderController extends BaseFrontController
             $invoiceAddressId = $form->get("invoice-address")->getData();
             $paymentModuleId = $form->get("payment-module")->getData();
 
+            // -DC- Check free order validity
+            if ($paymentModuleId == 24) {
+            	$cart = $this->getSession()->getSessionCart($this->getDispatcher());
+            	$discount = $cart->getDiscount();
+            	if ($discount == 0) {
+            		throw new \Exception(
+            			$this->getTranslator()->trans(
+            				"Invoice free order cannot have zero discount",
+            				[],
+            				Front::MESSAGE_DOMAIN
+            				)
+            			);
+            	}
+            }
+
             /* check that the invoice address belongs to the current customer */
             $invoiceAddress = AddressQuery::create()->findPk($invoiceAddressId);
             if ($invoiceAddress->getCustomerId() !== $this->getSecurityContext()->getCustomerUser()->getId()) {
